@@ -31,7 +31,6 @@ namespace PacManDuel.Models
         {
             var playerOutputFilePath = _workingPath + System.IO.Path.DirectorySeparatorChar + Properties.Settings.Default.SettingBotOutputFileName;
             File.Delete(playerOutputFilePath);
-            var startTime = DateTime.Now;
             var p = new Process
             {
                 StartInfo =
@@ -45,38 +44,23 @@ namespace PacManDuel.Models
             };
 
             p.Start();
-            try {
-                startTime = p.StartTime; // Adjust for actual start time of process
-            }
-            catch (Exception ex)
+            bool didExit = p.WaitForExit(Properties.Settings.Default.SettingBotOutputTimeoutSeconds * 1000);
+            if (!didExit)
+                p.Kill();
+            if (!File.Exists(playerOutputFilePath))
             {
-                Console.WriteLine(ex.ToString());
+                logFile.WriteLine("[GAME] : Timeout from player " + _playerName);
+                return null;
             }
-            var attemptFetchingMaze = true;
-            while (attemptFetchingMaze)
+            try
             {
-                if (File.Exists(playerOutputFilePath))
-                {
-                    Thread.Sleep(50); // Allow file write to complete, otherwise might get permission exception or corrupt file
-                    if (!p.HasExited) p.Kill();
-                    try
-                    {
-                        var mazeFromPlayer = new Maze(playerOutputFilePath);
-                        return mazeFromPlayer;
-                    }
-                    catch (UnreadableMazeException e)
-                    {
-                        Console.WriteLine(e.ToString());
-                        logFile.WriteLine("[GAME] : Unreadable maze from player " + _playerName);
-                    }
-                }
-                if ((DateTime.Now - startTime).TotalSeconds > Properties.Settings.Default.SettingBotOutputTimeoutSeconds)
-                {
-                    attemptFetchingMaze = false;
-                    if (!p.HasExited) p.Kill();
-                    logFile.WriteLine("[GAME] : Timeout from player " + _playerName);
-                }
-                Thread.Sleep(100);
+                var mazeFromPlayer = new Maze(playerOutputFilePath);
+                return mazeFromPlayer;
+            }
+            catch (UnreadableMazeException e)
+            {
+                Console.WriteLine(e.ToString());
+                logFile.WriteLine("[GAME] : Unreadable maze from player: " + _playerName);
             }
             return null;
         }
