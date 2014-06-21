@@ -6,7 +6,7 @@ using PacManDuel.Shared;
 
 namespace PacManDuel.Models
 {
-    class Game
+    public class Game
     {
         private readonly PlayerPool _playerPool;
         private readonly GameMarshaller _gameMarshaller;
@@ -171,10 +171,14 @@ namespace PacManDuel.Models
                 file.WriteLine("GAME: " + winner.GetSymbol() + "," + gameOutcome + "," + _iteration);
         }
 
-        private static void RegenerateOpponentIfDead(Point opponentPosition, Maze mazeFromPlayer)
+        public static bool RegenerateOpponentIfDead(Point opponentPosition, Maze mazeFromPlayer)
         {
-            if (opponentPosition.IsEmpty)
+            if (opponentPosition.IsEmpty) 
+            {
                 mazeFromPlayer.SetSymbol(Properties.Settings.Default.MazeCenterX, Properties.Settings.Default.MazeCenterY, Symbols.SYMBOL_PLAYER_B);
+                return true;
+            }
+            return false;
         }
 
     }

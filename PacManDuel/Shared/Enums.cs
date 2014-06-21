@@ -1,6 +1,6 @@
 ﻿namespace PacManDuel.Shared
 {
-    internal class Enums
+    public static class Enums
     {
 
         public enum MazeValidationOutcome

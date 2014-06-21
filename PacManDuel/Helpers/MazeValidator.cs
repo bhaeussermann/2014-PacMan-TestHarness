@@ -8,11 +8,11 @@ using System.IO;
 
 namespace PacManDuel.Helpers
 {
-    class MazeValidator
+    public static class MazeValidator
     {
         private const int _EXACT_NUMBER_OF_DIFFERENCES_FOR_LEGAL_MOVE = 2;
 
-        public static Enums.MazeValidationOutcome ValidateMaze(Maze currentMaze, Maze previousMaze, StreamWriter logFile)
+        public static Enums.MazeValidationOutcome ValidateMaze(Maze currentMaze, Maze previousMaze, StreamWriter logFile = null)
         {
             if (!IsMazeValid(currentMaze, previousMaze, logFile))
                 return Enums.MazeValidationOutcome.InvalidMazeTooManyChanges;
@@ -37,7 +37,8 @@ namespace PacManDuel.Helpers
             var diffs = GetNumberOfDifferences(currentMaze, previousMaze);
             if (diffs == _EXACT_NUMBER_OF_DIFFERENCES_FOR_LEGAL_MOVE) return true;
 
-            logFile.WriteLine("[Validator] : Failure: Number of changes is: " + diffs);
+            if (logFile != null)
+                logFile.WriteLine("[Validator] : Failure: Number of changes is: " + diffs);
             return false;
         }
 
@@ -64,6 +65,11 @@ namespace PacManDuel.Helpers
         private static IEnumerable<Point> GetPossibleMoves(Maze previousMaze)
         {
             var previousCoordinate = previousMaze.FindCoordinateOf(Symbols.SYMBOL_PLAYER_A);
+            var opponentCoordinate = previousMaze.FindCoordinateOf(Symbols.SYMBOL_PLAYER_B);
+
+            if (previousCoordinate == Point.Empty)
+                throw new Exception("!!!!");
+
             var moveList = new List<Point>();
             // Right
             if (previousCoordinate.Y + 1 < Properties.Settings.Default.MazeWidth)
@@ -80,13 +86,17 @@ namespace PacManDuel.Helpers
             // Down
             if (previousCoordinate.X + 1 < Properties.Settings.Default.MazeHeight)
                 if (previousMaze.GetSymbol(previousCoordinate.X + 1, previousCoordinate.Y) != Symbols.SYMBOL_WALL &&
-                    !WasInRespawnEntranceA(previousCoordinate.X, previousCoordinate.Y))
+                    !WasInRespawnEntranceA(previousCoordinate.X, previousCoordinate.Y) && 
+                    // Opponent cannot be eaten while in the respawn zone.
+                    (!WasInRespawnZone(opponentCoordinate.X, opponentCoordinate.Y) || previousCoordinate.Y!=opponentCoordinate.Y || previousCoordinate.X + 1!=opponentCoordinate.X))
                     moveList.Add(new Point(previousCoordinate.X + 1, previousCoordinate.Y));
 
             // Up
             if (previousCoordinate.X - 1 >= 0)
                 if (previousMaze.GetSymbol(previousCoordinate.X - 1, previousCoordinate.Y) != Symbols.SYMBOL_WALL &&
-                    !WasInRespawnEntranceB(previousCoordinate.X, previousCoordinate.Y))
+                !WasInRespawnEntranceB(previousCoordinate.X, previousCoordinate.Y) && 
+                    // Opponent cannot be eaten while in the respawn zone.
+                    (!WasInRespawnZone(opponentCoordinate.X, opponentCoordinate.Y) || previousCoordinate.Y!=opponentCoordinate.Y || previousCoordinate.X - 1!=opponentCoordinate.X))
                     moveList.Add(new Point(previousCoordinate.X - 1, previousCoordinate.Y));
 
             // Wrap right

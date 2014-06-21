@@ -5,9 +5,11 @@ using PacManDuel.Shared;
 
 namespace PacManDuel.Models
 {
-    class Maze
+    public class Maze
     {
         private readonly char[][] _map;
+
+        public Maze() : this(Properties.Settings.Default.SettingInitialMazeFilePath) {}
 
         public Maze(String filePath)
         {

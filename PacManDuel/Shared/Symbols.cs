@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PacManDuel.Shared
 {
-    class Symbols
+    public static class Symbols
     {
         public const char SYMBOL_PLAYER_A = 'A';
         public const char SYMBOL_PLAYER_B = 'B';

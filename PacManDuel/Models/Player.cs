@@ -7,7 +7,7 @@ using PacManDuel.Exceptions;
 
 namespace PacManDuel.Models
 {
-    class Player
+    public class Player
     {
         private readonly String _playerName;
         private readonly String _workingPath;
@@ -25,6 +25,13 @@ namespace PacManDuel.Models
             _score = 0;
             _numberOfPoisonPills = 1;
             _symbol = symbol;
+        }
+
+        public Player(Player player) : this(player._playerName, player._workingPath, player._executableFileName, player._symbol)
+        {
+            _score = player._score;
+            _numberOfPoisonPills = player._numberOfPoisonPills;
+            _currentPosition = player._currentPosition;
         }
 
         public Maze GetMove(Maze maze, String outputFilePath, StreamWriter logFile)

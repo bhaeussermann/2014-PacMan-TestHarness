@@ -4,7 +4,7 @@ using PacManDuel.Shared;
 
 namespace PacManDuel.Helpers
 {
-    class TurnMarshaller
+    public static class TurnMarshaller
     {
         public static Enums.TurnOutcome ProcessMove(Maze currentMaze, Maze previousMaze, Point currentPosition, Point previousPosition, Point opponentPosition, Player currentPlayer)
         {
