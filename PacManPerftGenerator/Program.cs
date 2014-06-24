@@ -6,11 +6,37 @@ using PacManDuel.Helpers;
 
 namespace PacManPerftGenerator
 {
+    // Generates Perft-values for the rules as implemented in the PacManDuel project.
+    // See http://phpbb-entelect100k.rhcloud.com/viewtopic.php?f=2&t=27
     class MainClass
     {
         private const int MazeWidth = 19;
+
         private static readonly Size[] MoveDirections = new Size[] { new Size(-1, 0), new Size(1, 0), new Size(0, -1), new Size(0, 1) };
         private static readonly bool[] DropPoisonPillValues = new bool[] { false, true };
+        private static readonly long[] ExpectedPerftValues = new long[] {
+            1,          // 0
+            4,          // 1
+            16,         // 2
+            72,         // 3
+            324,        // 4
+            864,        // 5
+            2296,       // 6
+            7600,       // 7
+            25167,      // 8
+            59456,      // 9
+            140254,     // 10
+            436578,     // 11
+            1357407,    // 12
+            3104512,    // 13
+            7092442,    // 14
+            21487688,   // 15
+            65032362,   // 16
+            146216759,  // 17
+            328439363,  // 18
+            978711725,  // 19
+            2913883204  // 20
+        };
 
         public static void Main (string[] args)
         {
@@ -18,8 +44,18 @@ namespace PacManPerftGenerator
             Maze maze = new Maze();
             playerA.SetCurrentPosition(maze.FindCoordinateOf(Symbols.SYMBOL_PLAYER_A));
             playerB.SetCurrentPosition(maze.FindCoordinateOf(Symbols.SYMBOL_PLAYER_B));
-            for (int i=1; i<=20; i++)
-                Console.WriteLine(i+": "+Perft(maze, playerA, playerB, i));
+
+            for (int i = 1; i <= 20; i++) 
+            {
+                long perft = Perft(maze, playerA, playerB, i);
+                if (perft != ExpectedPerftValues[i]) 
+                {
+                    Console.WriteLine(string.Format("Wrong Perft value for depth {0}: {1}. Expected: {2}", i, perft, ExpectedPerftValues[i]));
+                    return;
+                }
+                Console.WriteLine(string.Format("{0}: {1}", i, perft));
+            }
+            Console.WriteLine("Perft-value test passed!");
         }
 
         private static long Perft(Maze currentMaze, Player currentPlayer, Player nextPlayer, int depth)
@@ -61,11 +97,6 @@ namespace PacManPerftGenerator
                     }
                 }
 
-            if (count == 0) 
-            {
-                // This is bad; log it.
-                currentMaze.Print();
-            }
             return count;
         }
 
