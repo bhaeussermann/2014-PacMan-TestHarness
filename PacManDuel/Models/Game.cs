@@ -21,7 +21,7 @@ namespace PacManDuel.Models
             _maze = new Maze(pathToInitialMaze);
             _gameMarshaller = new GameMarshaller();
             _iteration = 0;
-            _secondMazePlayer = 'A';
+            _secondMazePlayer = playerA.GetSymbol();
         }
 
         public GameResult Run(String folderPath)
@@ -101,9 +101,9 @@ namespace PacManDuel.Models
         {
             mazeFromPlayer.SwapPlayerSymbols();
             _maze = mazeFromPlayer;
-            if (_maze.FindCoordinateOf(_secondMazePlayer).IsEmpty)
+            if (_maze.FindCoordinateOf('A').IsEmpty)
             {
-                _maze.SetSymbol(Properties.Settings.Default.MazeCenterX, Properties.Settings.Default.MazeCenterY, _secondMazePlayer);
+                _maze.SetSymbol(Properties.Settings.Default.MazeCenterX, Properties.Settings.Default.MazeCenterY, 'A');
             }
             if (gameOutcome != Enums.GameOutcome.ProceedToNextRound)
             {
@@ -154,7 +154,8 @@ namespace PacManDuel.Models
                 new StreamWriter(folderPath + System.IO.Path.DirectorySeparatorChar + Properties.Settings.Default.SettingReplayFolder + System.IO.Path.DirectorySeparatorChar + "iteration" +
                                  _iteration + Properties.Settings.Default.SettingStateFileExtension);
             var mazeForFile = new Maze(_maze);
-            if ((_currentPlayer == null)||(_secondMazePlayer == _currentPlayer.GetSymbol()))
+            if (((_currentPlayer == null) && (_secondMazePlayer == 'B')) || 
+                ((_currentPlayer != null) && (_currentPlayer.GetSymbol() == 'A')))
                 mazeForFile.SwapPlayerSymbols();
             replayFile.Write(mazeForFile.ToFlatFormatString());
             replayFile.Close();
