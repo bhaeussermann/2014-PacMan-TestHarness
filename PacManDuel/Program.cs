@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using PacManDuel.Models;
 using System.Collections.Generic;
+using PacManDuel.Shared;
 
 namespace PacManDuel
 {
@@ -61,13 +62,13 @@ namespace PacManDuel
             var randomPlayer = random.Next(1, 3);
             if (randomPlayer == 1)
             {
-                playerA = new Player("botA", playerAPath, playerABot, 'A');
-                playerB = new Player("botB", playerBPath, playerBBot, 'B');
+                playerA = new Player("botA", playerAPath, playerABot, Symbols.SYMBOL_PLAYER_A);
+                playerB = new Player("botB", playerBPath, playerBBot, Symbols.SYMBOL_PLAYER_B);
             }
             else
             {
-                playerA = new Player("botB", playerBPath, playerBBot, 'B');
-                playerB = new Player("botA", playerAPath, playerABot, 'A');
+                playerA = new Player("botB", playerBPath, playerBBot, Symbols.SYMBOL_PLAYER_B);
+                playerB = new Player("botA", playerAPath, playerABot, Symbols.SYMBOL_PLAYER_A);
             }
             
             var game = new Game(playerA, playerB, Properties.Settings.Default.SettingInitialMazeFilePath);
